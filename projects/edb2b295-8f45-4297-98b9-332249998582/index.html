@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Værmelding Norge</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7fafc;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            font-size: 1.5rem;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            padding: 16px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .weather-card {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s;
+        }
+        .weather-card:hover {
+            transform: translateY(-5px);
+        }
+        .location {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+        .temperature {
+            font-size: 2rem;
+            margin-bottom: 4px;
+        }
+        .details {
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        .forecast {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 8px;
+            font-size: 0.8rem;
+        }
+        .spinner, .error-message {
+            text-align: center;
+            margin-top: 50px;
+        }
+        .spinner {
+            font-size: 2rem;
+        }
+        .error-message {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <header>Værmelding Norge</header>
+    <div class="spinner" id="spinner">⏳ Loading weather data...</div>
+    <div class="container" id="weatherContainer" style="display: none;">
+        <!-- Weather Cards will be dynamically inserted here -->
+    </div>
+    <div class="error-message" id="errorMessage" style="display: none;">
+        Unable to load weather data. Please try again later.
+    </div>
+    <script>
+        const cities = [
+            { name: "Oslo", lat: 59.9139, lon: 10.7522 },
+            { name: "Bergen", lat: 60.3913, lon: 5.3221 },
+            { name: "Stavanger", lat: 58.9700, lon: 5.7331 },
+            { name: "Trondheim", lat: 63.4305, lon: 10.3951 }
+        ];
+
+        function getUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    fetchWeatherData(position.coords.latitude, position.coords.longitude, 'Your Location');
+                }, () => {
+                    fetchWeatherData(59.9139, 10.7522, 'Oslo (Fallback)');
+                });
+            } else {
+                fetchWeatherData(59.9139, 10.7522, 'Oslo (Fallback)');
+            }
+        }
+
+        function fetchWeatherData(lat, lon, locationName) {
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=Europe/Oslo`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    createWeatherCard(data, locationName);
+                    document.getElementById('spinner').style.display = 'none';
+                })
+                .catch(() => {
+                    document.getElementById('errorMessage').style.display = 'block';
+                    document.getElementById('spinner').style.display = 'none';
+                });
+        }
+
+        function createWeatherCard(data, location) {
+            const container = document.getElementById('weatherContainer');
+            container.style.display = 'grid';
+            const card = document.createElement('div');
+            card.className = 'weather-card';
+            const temperature = data.current_weather.temperature_2m;
+            const weatherCode = data.current_weather.weather_code;
+            const humidity = data.current_weather.relative_humidity_2m;
+            const windSpeed = data.current_weather.wind_speed_10m;
+
+            card.innerHTML = `
+                <div class="location">${location}</div>
+                <div class="temperature">${temperature}°C</div>
+                <div class="details">
+                    <span>${getWeatherIcon(weatherCode)} ${getWeatherDescription(weatherCode)}</span>
+                    <span>💧${humidity}%</span>
+                    <span>🌬️${windSpeed} km/h</span>
+                </div>
+                <div class="forecast">Loading forecast...</div>
+            `;
+            container.appendChild(card);
+        }
+
+        function updateWeatherCards() {
+            getUserLocation();
+            cities.forEach(city => {
+                fetchWeatherData(city.lat, city.lon, city.name);
+            });
+        }
+
+        function getWeatherIcon(code) {
+            if (code === 0) return '☀️';
+            if (code >= 1 && code <= 3) return '⛅';
+            if (code >= 61 && code <= 67) return '🌧️';
+            if (code >= 71 && code <= 77) return '❄️';
+            if (code >= 95 && code <= 99) return '⛈️';
+            return '❓';
+        }
+
+        function getWeatherDescription(code) {
+            switch (code) {
+                case 0: return 'Clear';
+                case 1: return 'Mainly Clear';
+                case 2: return 'Partly Cloudy';
+                case 3: return 'Overcast';
+                case 61: return 'Showers';
+                case 71: return 'Snow Showers';
+                case 95: return 'Thunderstorm';
+                default: return 'Unknown';
+            }
+        }
+
+        window.onload = updateWeatherCards;
+    </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Clock</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #222;
+            color: #f0f0f0;
+            transition: background-color 0.5s, color 0.5s;
+        }
+        .clock {
+            text-align: center;
+        }
+        .time {
+            font-size: 6rem;
+        }
+        .date {
+            font-size: 1.5rem;
+        }
+        .settings {
+            margin-top: 20px;
+        }
+        .toggle {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="clock">
+        <div id="time" class="time"></div>
+        <div id="date" class="date"></div>
+        <div class="settings">
+            <button id="formatToggle" class="toggle">Toggle 12/24 Hour</button>
+            <button id="themeToggle" class="toggle">Toggle Light/Dark</button>
+        </div>
+    </div>
+
+    <script>
+        let use12HourFormat = localStorage.getItem('use12HourFormat') === 'true';
+        let darkMode = localStorage.getItem('darkMode') === 'true';
+
+        const timeElement = document.getElementById('time');
+        const dateElement = document.getElementById('date');
+        const formatToggle = document.getElementById('formatToggle');
+        const themeToggle = document.getElementById('themeToggle');
+
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+
+            if (use12HourFormat) {
+                hours = hours % 12 || 12;
+            }
+            const hoursDisplay = String(hours).padStart(2, '0');
+
+            const timeString = use12HourFormat ? `${hoursDisplay}:${minutes}:${seconds} ${ampm}` : `${hoursDisplay}:${minutes}:${seconds}`;
+            const dateString = now.toLocaleDateString();
+
+            timeElement.textContent = timeString;
+            dateElement.textContent = dateString;
+        }
+
+        function applyTheme() {
+            if (darkMode) {
+                document.body.style.backgroundColor = '#222';
+                document.body.style.color = '#f0f0f0';
+            } else {
+                document.body.style.backgroundColor = '#f0f0f0';
+                document.body.style.color = '#222';
+            }
+        }
+
+        formatToggle.addEventListener('click', () => {
+            use12HourFormat = !use12HourFormat;
+            localStorage.setItem('use12HourFormat', use12HourFormat);
+        });
+
+        themeToggle.addEventListener('click', () => {
+            darkMode = !darkMode;
+            localStorage.setItem('darkMode', darkMode);
+            applyTheme();
+        });
+
+        setInterval(updateClock, 1000);
+        applyTheme();
+        updateClock();
+    </script>
+</body>
+</html>

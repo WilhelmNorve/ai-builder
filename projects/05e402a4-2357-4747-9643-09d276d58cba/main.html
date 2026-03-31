@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Blog - Discover Norway</title>
+    <style>
+        body, html { margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
+        header { position: fixed; width: 100%; background-color: rgba(26, 54, 93, 0.7); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
+        nav a { color: white; margin: 0 10px; text-decoration: none; transition: color 0.2s ease; }
+        nav a:hover { color: #dc2626; text-decoration: underline; }
+        .hero { background-image: url('https://picsum.photos/seed/norway-fjord/1920/800'); height: 100vh; background-attachment: fixed; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; color: #ffffff; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); }
+        .hero h1 { font-size: 3em; margin: 0; }
+        .hero button { background-color: #dc2626; color: #ffffff; border: none; padding: 10px 20px; margin-top: 20px; border-radius: 5px; transition: background-color 0.2s ease; }
+        .hero button:hover { background-color: #a82424; }
+        section { padding: 60px 20px; }
+        .grid { display: grid; gap: 20px; }
+        .destinations { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+        .posts { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+        .card { background-color: #fff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden; transition: transform 0.2s ease; }
+        .card:hover { transform: translateY(-10px); }
+        .card img { width: 100%; }
+        .card-content { padding: 20px; }
+        .about img { width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+        footer { background-color: #1a365d; color: #ffffff; padding: 20px; text-align: center; }
+        @media (max-width: 768px) {
+          nav { display: none; }
+          header { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Travel Norway</div>
+        <nav>
+            <a href="#hero">Home</a>
+            <a href="#destinations">Destinations</a>
+            <a href="#posts">Blog</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+    <div class="hero" id="hero">
+        <div>
+            <h1>Discover the Magic of Norway</h1>
+            <button onclick="document.getElementById('posts').scrollIntoView({ behavior: 'smooth' })">Explore Blog</button>
+        </div>
+    </div>
+    <section class="destinations grid" id="destinations">
+        <div class="card">
+            <img src="https://picsum.photos/seed/oslo-city/400/250" alt="Oslo">
+            <div class="card-content"><h3>Oslo</h3><p>Explore the vibrant capital city of Norway.</p></div>
+        </div>
+        <div class="card">
+            <img src="https://picsum.photos/seed/bergen-harbor/400/250" alt="Bergen">
+            <div class="card-content"><h3>Bergen</h3><p>A historic harbor surrounded by mountains.</p></div>
+        </div>
+        <div class="card">
+            <img src="https://picsum.photos/seed/trondheim-cathedral/400/250" alt="Trondheim">
+            <div class="card-content"><h3>Trondheim</h3><p>Home to the majestic Nidaros Cathedral.</p></div>
+        </div>
+        <div class="card">
+            <img src="https://picsum.photos/seed/stavanger-fjord/400/250" alt="Stavanger">
+            <div class="card-content"><h3>Stavanger</h3><p>Gateway to the Norwegian fjords.</p></div>
+        </div>
+    </section>
+    <section class="posts grid" id="posts">
+        <div class="card">
+            <img src="https://picsum.photos/seed/northern-lights/400/250" alt="Northern Lights">
+            <div class="card-content"><h3>Northern Lights Photography Guide</h3><p>Capture the Aurora Borealis with expert tips.</p></div>
+        </div>
+        <div class="card">
+            <img src="https://picsum.photos/seed/lofoten-hiking/400/250" alt="Lofoten Hiking">
+            <div class="card-content"><h3>Best Hiking Trails in Lofoten</h3><p>Discover the breathtaking trails in Lofoten.</p></div>
+        </div>
+        <div class="card">
+            <img src="https://picsum.photos/seed/norwegian-food/400/250" alt="Norwegian Food">
+            <div class="card-content"><h3>Norwegian Food Culture Explored</h3><p>A dive into the unique flavors of Norway.</p></div>
+        </div>
+        <div class="card">
+            <img src="https://picsum.photos/seed/midnight-sun/400/250" alt="Midnight Sun">
+            <div class="card-content"><h3>Midnight Sun Adventures</h3><p>Experience the never-setting sun.</p></div>
+        </div>
+    </section>
+    <section id="about">
+        <div class="grid" style="grid-template-columns: 1fr; gap: 40px;">
+            <img src="https://picsum.photos/seed/norway-mountains/800/500" alt="Norway Mountains">
+            <div>
+                <h2>About Norway</h2>
+                <p>Norway is known for its stunning landscapes, rich history, and vibrant culture. From the fjords to the northern lights, there's something for every traveler.</p>
+            </div>
+        </div>
+    </section>
+    <section id="contact">
+        <h2>Newsletter Signup</h2>
+        <form id="newsletter" onsubmit="return validateForm()">
+            <input type="email" placeholder="Enter your email" id="email" required>
+            <button type="submit">Subscribe</button>
+        </form>
+    </section>
+    <footer>
+        <p>Follow us on <a href="#" style="color: #dc2626; text-decoration: none;">Instagram</a>, <a href="#" style="color: #dc2626; text-decoration: none;">Facebook</a>, <a href="#" style="color: #dc2626; text-decoration: none;">Twitter</a></p>
+        <p>&copy; 2023 Travel Norway. All Rights Reserved.</p>
+    </footer>
+    <script>
+        function validateForm() {
+            const email = document.getElementById('email').value;
+            const emailPattern = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+            if (!emailPattern.test(email)) {
+                alert('Please enter a valid email address.');
+                return false;
+            }
+            alert('Thank you for subscribing!');
+            return true;
+        }
+
+        document.querySelector('header').addEventListener('click', function(){
+            this.classList.toggle('nav-active');
+        });
+        
+        window.addEventListener('scroll', function() {
+            document.querySelectorAll('.card').forEach(card => {
+                let rect = card.getBoundingClientRect();
+                if (rect.top < window.innerHeight) {
+                    card.style.transform = 'translateY(0)';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

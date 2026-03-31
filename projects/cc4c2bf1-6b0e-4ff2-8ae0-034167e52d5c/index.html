@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Australian AEST Clock with Fun Facts</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+        .hero-section {
+            background-image: url('https://picsum.photos/seed/australia/1200/400');
+            background-size: cover;
+            background-position: center;
+            padding: 100px 0;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+        .hero-section h1 {
+            position: relative;
+            z-index: 2;
+            font-size: 3rem;
+        }
+        .australian-theme {
+            background: linear-gradient(135deg, #FFD700, #228B22);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin: 20px;
+            text-align: center;
+        }
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        } 
+        .digital-clock {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
+            margin-bottom: 10px;
+        }
+        .timezone-label {
+            color: #228B22;
+        }
+        .fun-fact-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 300px;
+            position: relative;
+        }
+        .fact-text {
+            font-size: 1rem;
+            color: #333;
+        }
+        .refresh-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: #000080;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .refresh-btn:hover {
+            background: #0056b3;
+        }
+        .error-message {
+            background: #fee2e2;
+            border: 1px solid #f87171;
+            color: #b91c1c;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 20px;
+            text-align: center;
+        }
+        footer {
+            background: #000080;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+        footer img {
+            width: 30px;
+            vertical-align: middle;
+        }
+        @media only screen and (max-width: 600px) {
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+            .fun-fact-card {
+                width: 90%;
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-section">
+        <h1>Australian AEST Clock with Fun Facts</h1>
+    </div>
+    
+    <div class="australian-theme">
+        <div class="clock-container">
+            <div class="digital-clock" id="digital-clock"></div>
+            <div class="timezone-label">Australian Eastern Standard Time (AEST)</div>
+        </div>
+        <div class="fun-fact-card">
+            <div class="fact-text" id="fact-text"></div>
+            <button class="refresh-btn" onclick="refreshFact()">Get Another Fact</button>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Made with love from Australia <img src="https://picsum.photos/seed/flag/30/20" alt="Australian Flag Icon"></p>
+    </footer>
+    
+    <script>
+        const facts = [
+            "Australia is home to the world's largest working cattle station.",
+            "The Great Barrier Reef is the largest coral reef system.",
+            "Australia has the longest fence in the world.",
+            "Over 80% of Australians live within 100 kilometers of the coast.",
+            // More facts can be added here
+        ];
+
+        function updateAESTClock() {
+            const now = new Date();
+            const options = { timeZone: 'Australia/Sydney', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            const timeString = new Intl.DateTimeFormat('en-AU', options).format(now);
+            const clockEl = document.getElementById('digital-clock');
+            if (clockEl) clockEl.textContent = timeString;
+        }
+
+        function getRandomFact() {
+            const randomIndex = Math.floor(Math.random() * facts.length);
+            return facts[randomIndex];
+        }
+
+        function displayFunFact() {
+            const factEl = document.getElementById('fact-text');
+            if (factEl) factEl.textContent = getRandomFact();
+        }
+
+        function refreshFact() {
+            try {
+                displayFunFact();
+            } catch (error) {
+                showError('Failed to load fun fact.');
+            }
+        }
+
+        function initializeClock() {
+            try {
+                updateAESTClock();
+                setInterval(updateAESTClock, 1000);
+                displayFunFact();
+            } catch (error) {
+                showError('Failed to initialize clock or load facts.');
+            }
+        }
+
+        function showError(message) {
+            const errorEl = document.createElement('div');
+            errorEl.className = 'error-message';
+            errorEl.textContent = message;
+            const body = document.querySelector('body');
+            if (body) body.appendChild(errorEl);
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeClock);
+    </script>
+</body>
+</html>

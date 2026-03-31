@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stortingssimulator 2024</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f4f4f9;
+        }
+        header {
+            background: linear-gradient(to right, #003366, #00509e);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            color: #fff;
+        }
+        header .logo {
+            font-size: 24px;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.2s ease;
+        }
+        nav a:hover {
+            text-decoration: underline;
+            color: #ffd700;
+        }
+        .hero {
+            background-image: url('https://picsum.photos/seed/parliament/1200/400');
+            background-size: cover;
+            padding: 80px 20px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .hero h1, .hero p {
+            position: relative;
+            z-index: 1;
+        }
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .hero p {
+            font-size: 24px;
+        }
+        .content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: box-shadow 0.2s ease;
+            margin-bottom: 20px;
+        }
+        .card:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        .party-bar {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .party-color {
+            height: 20px;
+            border-radius: 4px;
+            transition: width 0.2s ease;
+        }
+        .interactive-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .slider {
+            width: 100%;
+        }
+        h2 {
+            margin-top: 0;
+        }
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            .hero p {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">🏛️ Stortingssimulator</div>
+        <nav>
+            <a href="#live-dashboard">Målinger</a>
+            <a href="#coalition-builder">Koalisjonsspill</a>
+            <a href="#scenarios">Scenarier</a>
+        </nav>
+    </header>
+    
+    <section class="hero">
+        <h1>Stortingssimulator 2024</h1>
+        <p>Utforsk norsk politikk - fra meningsmålinger til regjeringsalternativer</p>
+    </section>
+    
+    <main class="content">
+        <section id="live-dashboard" class="card">
+            <h2>Målinger: Nåværende Meningsmålinger</h2>
+            <div id="polling-data"></div>
+        </section>
+        
+        <section id="coalition-builder" class="card">
+            <h2>Koalisjonsspill: Bygg Din Egen Regjering</h2>
+            <div class="interactive-section" id="coalition-build">
+                <div id="available-parties">Tilgjengelige Partier</div>
+                <div id="your-coalition">Din Koalisjon</div>
+            </div>
+            <div>Sum: <span id="seat-count">0</span>/169 (Majority: <span id="majority">85</span>)</div>
+        </section>
+        
+        <section id="scenarios" class="card">
+            <h2>Scenarier: Hva Hvis?</h2>
+            <div class="interactive-section" id="scenario-sliders"></div>
+        </section>
+    </main>
+
+    <script>
+        const parties = {
+            "AP": { name: "Arbeiderpartiet", support: 18.5, color: "#DA020E", seats: 0 },
+            "H": { name: "Høyre", support: 20.2, color: "#0065F1", seats: 0 },
+            "SP": { name: "Senterpartiet", support: 6.8, color: "#00841F", seats: 0 },
+            "FrP": { name: "Fremskrittspartiet", support: 11.4, color: "#006AA7", seats: 0 },
+            "SV": { name: "Sosialistisk Venstreparti", support: 7.9, color: "#FF7100", seats: 0 },
+            "R": { name: "Rødt", support: 4.2, color: "#D2001F", seats: 0 },
+            "V": { name: "Venstre", support: 4.6, color: "#066A36", seats: 0 },
+            "MDG": { name: "Miljøpartiet De Grønne", support: 3.1, color: "#66B32E", seats: 0 },
+            "KrF": { name: "Kristelig Folkeparti", support: 3.8, color: "#F4A024", seats: 0 },
+            "PP": { name: "Pasientfokus", support: 0.8, color: "#7B3F98", seats: 0 }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const pollingData = document.getElementById('polling-data');
+            const scenarioSliders = document.getElementById('scenario-sliders');
+            const availableParties = document.getElementById('available-parties');
+            const coalitionUl = document.createElement('ul');
+
+            for (let key in parties) {
+                const party = parties[key];
+                // Polling data bar
+                const barContainer = document.createElement('div');
+                barContainer.classList.add('party-bar');
+                const partyName = document.createElement('span');
+                partyName.textContent = party.name + ':';
+                barContainer.appendChild(partyName);
+
+                const partyBar = document.createElement('div');
+                partyBar.classList.add('party-color');
+                partyBar.style.backgroundColor = party.color;
+                partyBar.style.width = party.support + '%';
+                barContainer.appendChild(partyBar);
+
+                pollingData.appendChild(barContainer);
+
+                // Scenario sliders
+                const sliderDiv = document.createElement('div');
+                const label = document.createElement('label');
+                label.htmlFor = 'slider-' + key;
+                label.textContent = party.name;
+                sliderDiv.appendChild(label);
+
+                const slider = document.createElement('input');
+                slider.id = 'slider-' + key;
+                slider.type = 'range';
+                slider.min = '0';
+                slider.max = '40';
+                slider.value = party.support;
+                slider.className = 'slider';
+                slider.style.background = party.color;
+                sliderDiv.appendChild(slider);
+                
+                scenarioSliders.appendChild(sliderDiv);
+
+                // Coalition list
+                const partyLi = document.createElement('li');
+                partyLi.innerText = party.name;
+                partyLi.style.backgroundColor = party.color;
+                coalitionUl.appendChild(partyLi);
+            }
+
+            availableParties.appendChild(coalitionUl);
+        });
+    </script>
+</body>
+</html>

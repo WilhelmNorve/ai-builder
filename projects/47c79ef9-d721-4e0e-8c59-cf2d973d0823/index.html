@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .calculator { width: 300px; margin: 50px auto; }
+        .display { width: 100%; height: 40px; background: #f3f3f3; margin-bottom: 5px; display: flex; align-items: center; justify-content: right; padding: 0 5px; }
+        .buttons { display: flex; flex-wrap: wrap; }
+        button { width: 25%; padding: 20px; margin: 1px; border: none; background: #ddd; font-size: 1em; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+        <div class="buttons">
+            <button onclick="pressButton('1')">1</button>
+            <button onclick="pressButton('2')">2</button>
+            <button onclick="pressButton('3')">3</button>
+            <button onclick="operate('+')">+</button>
+            <button onclick="pressButton('4')">4</button>
+            <button onclick="pressButton('5')">5</button>
+            <button onclick="pressButton('6')">6</button>
+            <button onclick="operate('-')">-</button>
+            <button onclick="pressButton('7')">7</button>
+            <button onclick="pressButton('8')">8</button>
+            <button onclick="pressButton('9')">9</button>
+            <button onclick="operate('*')">×</button>
+            <button onclick="pressButton('0')">0</button>
+            <button onclick="calculate()">=</button>
+            <button onclick="clearDisplay()">C</button>
+            <button onclick="operate('/')">÷</button>
+        </div>
+    </div>
+    <script>
+        let currentInput = '';
+        let operation = null;
+        let previousValue = null;
+        
+        function pressButton(value) {
+            if (currentInput === '0') {
+                currentInput = value;
+            } else {
+                currentInput += value;
+            }
+            updateDisplay();
+        }
+        
+        function operate(op) {
+            if (currentInput === '') return;
+            if (previousValue !== null) {
+                calculate();
+            }
+            operation = op;
+            previousValue = parseFloat(currentInput);
+            currentInput = '';
+        }
+        
+        function calculate() {
+            if (previousValue === null || currentInput === '') return;
+            let result;
+            switch (operation) {
+                case '+':
+                    result = previousValue + parseFloat(currentInput);
+                    break;
+                case '-':
+                    result = previousValue - parseFloat(currentInput);
+                    break;
+                case '*':
+                    result = previousValue * parseFloat(currentInput);
+                    break;
+                case '/':
+                    result = previousValue / parseFloat(currentInput);
+                    break;
+                default:
+                    return;
+            }
+            currentInput = result.toString();
+            operation = null;
+            previousValue = null;
+            updateDisplay();
+        }
+        
+        function clearDisplay() {
+            currentInput = '';
+            operation = null;
+            previousValue = null;
+            updateDisplay();
+        }
+        
+        function updateDisplay() {
+            const display = document.getElementById('display');
+            display.textContent = currentInput || '0';
+        }
+    </script>
+</body>
+</html>

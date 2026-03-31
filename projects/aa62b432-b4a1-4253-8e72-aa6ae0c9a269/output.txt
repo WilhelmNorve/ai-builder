@@ -1,0 +1,1 @@
+React/JSX component generated successfully (no runtime execution needed).

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Norwegian Weather</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e0f7fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        header {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .location {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .weather-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .temperature {
+            font-size: 48px;
+            margin: 10px 0;
+        }
+        .condition {
+            font-size: 20px;
+        }
+        button {
+            background: #0277bd;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #01579b;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>Norwegian Weather</header>
+    <div class="location">Loading location...</div>
+    <div class="weather-card">
+        <div class="temperature">--°</div>
+        <div class="condition">Loading...</div>
+        <div class="icon">☁️</div>
+    </div>
+    <div>
+        <button onclick="switchToCity('Oslo')">Oslo</button>
+        <button onclick="switchToCity('Bergen')">Bergen</button>
+        <button onclick="switchToCity('Trondheim')">Trondheim</button>
+        <button onclick="switchToCity('Stavanger')">Stavanger</button>
+    </div>
+    <div class="error"></div>
+    <script>
+        const cityCoordinates = {
+            'Oslo': { lat: 59.9139, lon: 10.7522 },
+            'Bergen': { lat: 60.3913, lon: 5.3221 },
+            'Trondheim': { lat: 63.4305, lon: 10.3951 },
+            'Stavanger': { lat: 58.9700, lon: 5.7331 }
+        };
+
+        function getWeatherIcon(weatherCode) {
+            if (weatherCode === 0) return '☀️';
+            if (1 <= weatherCode && weatherCode <= 3) return '⛅';
+            if (weatherCode === 45 || weatherCode === 48) return '🌫️';
+            if (51 <= weatherCode && weatherCode <= 57) return '🌦️';
+            if (61 <= weatherCode && weatherCode <= 67) return '🌧️';
+            if (71 <= weatherCode && weatherCode <= 77) return '🌨️';
+            if (80 <= weatherCode && weatherCode <= 82) return '🌦️';
+            if (95 <= weatherCode && weatherCode <= 99) return '⛈️';
+            return '❓';
+        }
+
+        function getCurrentLocation() {
+            navigator.geolocation.getCurrentPosition(
+                position => fetchWeather(position.coords.latitude, position.coords.longitude, "Your Location"),
+                () => fetchWeather(cityCoordinates['Oslo'].lat, cityCoordinates['Oslo'].lon, 'Oslo')
+            );
+        }
+
+        function fetchWeather(lat, lon, cityName) {
+            document.querySelector('.location').innerText = `Weather for ${cityName}`;
+            document.querySelector('.error').style.display = 'none';
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,weathercode&timezone=Europe%2FOslo`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => displayWeather(data.current_weather, cityName))
+                .catch(err => handleError(`Weather API failed: ${err.message}`));
+        }
+
+        function displayWeather(data, location) {
+            document.querySelector('.temperature').innerText = `${data.temperature}°`;
+            document.querySelector('.condition').innerText = `Weather: ${data.weathercode}`;
+            document.querySelector('.icon').innerText = getWeatherIcon(data.weathercode);
+        }
+
+        function handleError(message) {
+            const errorContainer = document.querySelector('.error');
+            errorContainer.innerText = message;
+            errorContainer.style.display = 'block';
+        }
+
+        function switchToCity(cityName) {
+            const city = cityCoordinates[cityName];
+            fetchWeather(city.lat, city.lon, cityName);
+        }
+
+        window.onload = getCurrentLocation;
+    </script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Car Highway Night Scene</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+        a {
+            color: #38bdf8;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        header {
+            padding: 10px 20px;
+            background: #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .hero-section {
+            position: relative;
+            height: 60vh;
+            background-image: url('https://picsum.photos/seed/sportscarhighway/1600/600');
+            background-size: cover;
+            background-position: center;
+        }
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(14, 17, 24, 0.6);
+        }
+        .hero-content {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: #fff;
+            font-size: 2em;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .car-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+        .car-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .car-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            onerror: "this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg,#1e293b,#334155)'";
+        }
+        .image-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+        }
+        .download-btn, .fullscreen-btn {
+            background: rgba(51, 65, 85, 0.6);
+            border: none;
+            padding: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .download-btn:hover, .fullscreen-btn:hover {
+            background: rgba(56, 189, 248, 0.8);
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-overlay img {
+            max-width: 90vw;
+            max-height: 90vh;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f87171;
+            border: none;
+            color: #b91c1c;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        footer {
+            padding: 10px;
+            text-align: center;
+            background: #334155;
+        }
+        .error-message {
+            background: #fee2e2;
+            border: 1px solid #f87171;
+            color: #b91c1c;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav>
+        <a href="#gallery">Gallery</a>
+        <a href="#contact">Contact</a>
+    </nav>
+</header>
+
+<section class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">Sports Car Highway</div>
+</section>
+
+<section id="gallery" class="gallery-grid">
+    <!-- Car Cards -->
+    <div class="car-card">
+        <img src="https://picsum.photos/seed/ferrari/400/300" alt="Ferrari" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg,#1e293b,#334155)'">
+        <div class="image-controls">
+            <button class="download-btn" onclick="downloadImage('https://picsum.photos/seed/ferrari/400/300', 'ferrari.jpg')">Download</button>
+            <button class="fullscreen-btn" onclick="openFullscreen('https://picsum.photos/seed/ferrari/400/300')">Full Screen</button>
+        </div>
+    </div>
+    <div class="car-card">
+        <img src="https://picsum.photos/seed/lamborghini/400/300" alt="Lamborghini" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg,#1e293b,#334155)'">
+        <div class="image-controls">
+            <button class="download-btn" onclick="downloadImage('https://picsum.photos/seed/lamborghini/400/300', 'lamborghini.jpg')">Download</button>
+            <button class="fullscreen-btn" onclick="openFullscreen('https://picsum.photos/seed/lamborghini/400/300')">Full Screen</button>
+        </div>
+    </div>
+    <div class="car-card">
+        <img src="https://picsum.photos/seed/porsche/400/300" alt="Porsche" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg,#1e293b,#334155)'">
+        <div class="image-controls">
+            <button class="download-btn" onclick="downloadImage('https://picsum.photos/seed/porsche/400/300', 'porsche.jpg')">Download</button>
+            <button class="fullscreen-btn" onclick="openFullscreen('https://picsum.photos/seed/porsche/400/300')">Full Screen</button>
+        </div>
+    </div>
+    <div class="car-card">
+        <img src="https://picsum.photos/seed/nightdrive/400/300" alt="Night Drive" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg,#1e293b,#334155)'">
+        <div class="image-controls">
+            <button class="download-btn" onclick="downloadImage('https://picsum.photos/seed/nightdrive/400/300', 'nightdrive.jpg')">Download</button>
+            <button class="fullscreen-btn" onclick="openFullscreen('https://picsum.photos/seed/nightdrive/400/300')">Full Screen</button>
+        </div>
+    </div>
+    <div class="car-card">
+        <img src="https://picsum.photos/seed/supercar/400/300" alt="Supercar" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg,#1e293b,#334155)'">
+        <div class="image-controls">
+            <button class="download-btn" onclick="downloadImage('https://picsum.photos/seed/supercar/400/300', 'supercar.jpg')">Download</button>
+            <button class="fullscreen-btn" onclick="openFullscreen('https://picsum.photos/seed/supercar/400/300')">Full Screen</button>
+        </div>
+    </div>
+    <div class="car-card">
+        <img src="https://picsum.photos/seed/racecar/400/300" alt="Racecar" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg,#1e293b,#334155)'">
+        <div class="image-controls">
+            <button class="download-btn" onclick="downloadImage('https://picsum.photos/seed/racecar/400/300', 'racecar.jpg')">Download</button>
+            <button class="fullscreen-btn" onclick="openFullscreen('https://picsum.photos/seed/racecar/400/300')">Full Screen</button>
+        </div>
+    </div>
+</section>
+
+<div class="modal-overlay" id="modalOverlay">
+    <button class="close-btn" onclick="closeModal()">X</button>
+    <img id="modalImage" src="" alt="Fullscreen Image">
+</div>
+
+<footer id="contact">
+    <p>Contact us at <a href="mailto:cars@example.com">cars@example.com</a></p>
+</footer>
+
+<script>
+    function openFullscreen(imageSrc) {
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalImage = document.getElementById('modalImage');
+        if (modalOverlay && modalImage) {
+            modalImage.src = imageSrc;
+            modalOverlay.style.display = 'flex';
+        } else {
+            showError('Error displaying the image.');
+        }
+    }
+
+    function closeModal() {
+        const modalOverlay = document.getElementById('modalOverlay');
+        if (modalOverlay) {
+            modalOverlay.style.display = 'none';
+        }
+    }
+
+    function downloadImage(imageSrc, filename) {
+        try {
+            const link = document.createElement('a');
+            link.href = imageSrc;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            showError('Failed to download the image.');
+        }
+    }
+
+    function showError(message) {
+        const errorMessage = document.createElement('div');
+        errorMessage.className = 'error-message';
+        errorMessage.textContent = message;
+        document.body.appendChild(errorMessage);
+    }
+
+    // Initializing gallery and adding hover effects at DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            const gallery = document.querySelector('.gallery-grid');
+            if (gallery) {
+                // Hypothetical functions for gallery setup and hover effects
+                initializeGallery();
+                addImageHoverEffects();
+            } else {
+                showError('Gallery section missing.');
+            }
+        } catch (error) {
+            showError('An error occurred while loading the gallery.');
+        }
+    });
+
+    function initializeGallery() {
+        // Placeholder for actual gallery initialization logic
+    }
+
+    function addImageHoverEffects() {
+        // Placeholder for actual hover effects logic
+    }
+
+    document.addEventListener('keydown', handleKeyboardNavigation);
+
+    function handleKeyboardNavigation(event) {
+        // Placeholder for keyboard navigation logic
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Car Enthusiasts</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #1a1a1a;
+            color: #f5f5f5;
+        }
+
+        .navigation {
+            background-color: #111;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navigation a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            transition: color 0.2s ease;
+        }
+
+        .navigation a:hover {
+            color: #0ff;
+            text-decoration: underline;
+        }
+
+        .hero-section {
+            background-image: url('https://source.unsplash.com/1920x1080/?sportscar,highway,night,dark');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .overlay-text {
+            position: relative;
+            z-index: 2;
+            background: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .btn-primary {
+            background-color: #0ff;
+            color: #111;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            background-color: #08f;
+        }
+
+        .car-gallery {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            padding: 20px;
+        }
+
+        .car-card {
+            background-color: #222;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .car-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .car-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+        }
+
+        .details-section {
+            background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+            padding: 30px;
+            color: #f5f5f5;
+        }
+
+        footer {
+            background-color: #111;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            color: #777;
+        }
+
+        footer a {
+            color: #0ff;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            border: 1px solid #f87171;
+            color: #b91c1c;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .navigation {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="navigation">
+        <div>Sports Car Hub</div>
+        <nav>
+            <a href="#hero">Home</a>
+            <a href="#gallery">Gallery</a>
+            <a href="#details">Details</a>
+            <a href="#footer">Contact</a>
+        </nav>
+    </header>
+    
+    <main>
+        <section id="hero" class="hero-section">
+            <div class="overlay-text">
+                <h1>Experience the Thrill of Sports Cars</h1>
+                <button class="btn-primary" onclick="window.location.href='#gallery'">Explore Gallery</button>
+            </div>
+        </section>
+
+        <section id="gallery" class="car-gallery"></section>
+
+        <section id="details" class="details-section">
+            <h2>Car Specifications</h2>
+            <p>Explore the latest specs of your favorite sports cars right here. More details coming soon.</p>
+        </section>
+    </main>
+
+    <footer id="footer">
+        <p>&copy; 2023 Sports Car Enthusiasts</p>
+        <a href="https://twitter.com" target="_blank">Twitter</a>
+        <a href="https://facebook.com" target="_blank">Facebook</a>
+        <a href="https://instagram.com" target="_blank">Instagram</a>
+    </footer>
+
+    <script>
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            document.body.insertBefore(errorDiv, document.body.firstChild);
+        }
+
+        function loadHeroImage() {
+            try {
+                const heroSection = document.querySelector('.hero-section');
+                if (heroSection) {
+                    // Image already set in CSS, so no need to load it here
+                }
+            } catch (error) {
+                showError('Failed to load hero image.');
+            }
+        }
+
+        function populateGallery() {
+            try {
+                const gallery = document.querySelector('.car-gallery');
+                if (gallery) {
+                    const carImages = [
+                        'https://source.unsplash.com/800x600/?ferrari,night',
+                        'https://source.unsplash.com/800x600/?lamborghini,highway',
+                        'https://source.unsplash.com/800x600/?porsche,dark',
+                        'https://source.unsplash.com/800x600/?mclaren,road'
+                    ];
+                    carImages.forEach((src, index) => {
+                        const carCard = document.createElement('div');
+                        carCard.className = 'car-card';
+                        const img = document.createElement('img');
+                        img.src = src;
+                        img.alt = `Car ${index + 1}`;
+                        carCard.appendChild(img);
+                        gallery.appendChild(carCard);
+                    });
+                }
+            } catch (error) {
+                showError('Failed to populate image gallery.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHeroImage();
+            populateGallery();
+        });
+    </script>
+</body>
+</html>

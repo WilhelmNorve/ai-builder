@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Norwegian Weather Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px black;
+        }
+        .weather-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+        @media (min-width: 768px) {
+            .weather-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+        .weather-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .weather-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        .loading {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .temp {
+            font-size: 2em;
+            margin: 10px 0;
+        }
+        .additional-info {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <h1>Norwegian Weather Dashboard</h1>
+    <div class="weather-grid">
+        <div class="weather-card" id="current-location">
+            <div class="loading">🔄</div>
+        </div>
+        <div class="weather-card" id="oslo">
+            <div class="loading">🔄</div>
+        </div>
+        <div class="weather-card" id="bergen">
+            <div class="loading">🔄</div>
+        </div>
+        <div class="weather-card" id="trondheim">
+            <div class="loading">🔄</div>
+        </div>
+        <div class="weather-card" id="stavanger">
+            <div class="loading">🔄</div>
+        </div>
+    </div>
+    <script>
+        const cities = [
+            { id: 'oslo', name: 'Oslo', lat: 59.9139, lon: 10.7522 },
+            { id: 'bergen', name: 'Bergen', lat: 60.3913, lon: 5.3221 },
+            { id: 'trondheim', name: 'Trondheim', lat: 63.4305, lon: 10.3951 },
+            { id: 'stavanger', name: 'Stavanger', lat: 58.9700, lon: 5.7331 }
+        ];
+
+        async function fetchWeather(lat, lon) {
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&daily=weathercode&timezone=Europe%2FOslo`);
+            if (!res.ok) throw new Error('Failed to fetch weather data');
+            return res.json();
+        }
+
+        function weatherCodeToDescription(code) {
+            const descriptions = {
+                1: 'Clear Sky', 2: 'Mainly Clear', 3: 'Partly Cloudy', 45: 'Fog',
+                48: 'Depositing Rime Fog', 51: 'Drizzle', 61: 'Rain Showers', 71: 'Snow Showers',
+                80: 'Thunderstorm', 95: 'Thunderstorm with Hail'
+            };
+            return descriptions[code] || 'Unknown Weather';
+        }
+
+        function updateWeatherCard(id, title, weather) {
+            const card = document.getElementById(id);
+            card.innerHTML = `
+                <h3>${title}</h3>
+                <div class="temp">${weather.current_weather.temperature}°C</div>
+                <div>${weatherCodeToDescription(weather.daily.weathercode[0])}</div>
+                <div class="additional-info">
+                    Feels like: ${weather.hourly.apparent_temperature[0]}°C<br>
+                    Humidity: ${weather.hourly.relative_humidity_2m[0]}%<br>
+                    Wind: ${weather.current_weather.windspeed} m/s
+                </div>
+            `;
+        }
+
+        async function main() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    try {
+                        const weather = await fetchWeather(position.coords.latitude, position.coords.longitude);
+                        updateWeatherCard('current-location', 'Current Location', weather);
+                    } catch (error) {
+                        updateWeatherCard('current-location', 'Current Location (Error)', { error });
+                    }
+                }, async () => {
+                    try {
+                        const fallback = { lat: 59.9139, lon: 10.7522 };
+                        const weather = await fetchWeather(fallback.lat, fallback.lon);
+                        updateWeatherCard('current-location', 'Current Location (Fallback - Oslo)', weather);
+                    } catch (error) {
+                        updateWeatherCard('current-location', 'Current Location (Error)', { error });
+                    }
+                });
+            }
+
+            for (const city of cities) {
+                try {
+                    const weather = await fetchWeather(city.lat, city.lon);
+                    updateWeatherCard(city.id, city.name, weather);
+                } catch (error) {
+                    updateWeatherCard(city.id, `${city.name} (Error)`, { error });
+                }
+            }
+        }
+
+        main();
+    </script>
+</body>
+</html>

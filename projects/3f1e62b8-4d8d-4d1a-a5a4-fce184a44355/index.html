@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>British Time</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        #clock-container {
+            text-align: center;
+        }
+        #time {
+            font-size: 3em;
+            margin-bottom: 0.5em;
+        }
+        #date {
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <div id="clock-container">
+        <div id="title">British Time</div>
+        <div id="time"></div>
+        <div id="date"></div>
+    </div>
+    <script>
+        function updateTime() {
+            const options = { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-GB', options);
+            const dateString = now.toLocaleDateString('en-GB', { timeZone: 'Europe/London', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+            document.getElementById('time').textContent = timeString;
+            document.getElementById('date').textContent = dateString;
+        }
+
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Simple Calculator</title>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+        <div class="buttons">
+            <button class="btn" onclick="clearDisplay()">C</button>
+            <button class="btn"></button>
+            <button class="btn"></button>
+            <button class="btn" onclick="inputOperation('/')">÷</button>
+            <button class="btn" onclick="inputNumber(7)">7</button>
+            <button class="btn" onclick="inputNumber(8)">8</button>
+            <button class="btn" onclick="inputNumber(9)">9</button>
+            <button class="btn" onclick="inputOperation('*')">×</button>
+            <button class="btn" onclick="inputNumber(4)">4</button>
+            <button class="btn" onclick="inputNumber(5)">5</button>
+            <button class="btn" onclick="inputNumber(6)">6</button>
+            <button class="btn" onclick="inputOperation('-')">-</button>
+            <button class="btn" onclick="inputNumber(1)">1</button>
+            <button class="btn" onclick="inputNumber(2)">2</button>
+            <button class="btn" onclick="inputNumber(3)">3</button>
+            <button class="btn" onclick="inputOperation('+')">+</button>
+            <button class="btn" onclick="inputNumber(0)">0</button>
+            <button class="btn" onclick="inputDecimal()">.</button>
+            <button class="btn equals" onclick="calculate()">=</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f1f1f1;
+}
+
+.calculator {
+    width: 300px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.display {
+    background-color: #222;
+    color: #fff;
+    text-align: right;
+    padding: 20px;
+    font-size: 2em;
+    box-sizing: border-box;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+}
+
+.btn {
+    background-color: #ddd;
+    border: none;
+    padding: 20px;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #bbb;
+}
+
+.equals {
+    grid-column: span 2;
+    background-color: #f90;
+    color: #fff;
+}
+
+.equals:hover {
+    background-color: #f60;
+}
+let displayValue = '0';
+let currentOperation = null;
+let firstOperand = null;
+let waitingForSecondOperand = false;
+
+function updateDisplay() {
+    const display = document.getElementById('display');
+    display.innerText = displayValue;
+}
+
+function clearDisplay() {
+    displayValue = '0';
+    currentOperation = null;
+    firstOperand = null;
+    waitingForSecondOperand = false;
+    updateDisplay();
+}
+
+function inputNumber(number) {
+    if (waitingForSecondOperand) {
+        displayValue = number.toString();
+        waitingForSecondOperand = false;
+    } else {
+        displayValue = displayValue === '0' ? number.toString() : displayValue + number;
+    }
+    updateDisplay();
+}
+
+function inputDecimal() {
+    if (!displayValue.includes('.')) {
+        displayValue += '.';
+    }
+    updateDisplay();
+}
+
+function inputOperation(operator) {
+    if (currentOperation && waitingForSecondOperand) {
+        currentOperation = operator;
+        return;
+    }
+
+    if (firstOperand === null) {
+        firstOperand = parseFloat(displayValue);
+    } else if (currentOperation) {
+        const result = calculate();
+        displayValue = result.toString();
+        firstOperand = result;
+    }
+
+    waitingForSecondOperand = true;
+    currentOperation = operator;
+    updateDisplay();
+}
+
+function calculate() {
+    if (currentOperation && firstOperand !== null) {
+        const secondOperand = parseFloat(displayValue);
+        switch (currentOperation) {
+            case '+':
+                firstOperand += secondOperand;
+                break;
+            case '-':
+                firstOperand -= secondOperand;
+                break;
+            case '*':
+                firstOperand *= secondOperand;
+                break;
+            case '/':
+                firstOperand = secondOperand === 0 ? 'Error' : firstOperand / secondOperand;
+                break;
+            default:
+                return;
+        }
+        displayValue = firstOperand.toString();
+        currentOperation = null;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateDisplay();
+});

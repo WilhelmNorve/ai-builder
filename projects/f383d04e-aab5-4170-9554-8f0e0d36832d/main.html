@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stortingsimulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 20px;
+            justify-items: center;
+            background-color: #f4f4f9;
+        }
+
+        header, footer {
+            background-color: #024;
+            color: #fff;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+        }
+
+        main {
+            display: grid;
+            gap: 20px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .party-slider {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .party-slider label {
+            width: 100px;
+        }
+
+        .party-slider input[type="range"] {
+            flex-grow: 1;
+        }
+
+        #mandate-chart {
+            display: grid;
+            gap: 5px;
+            grid-template-columns: repeat(13, 1fr);
+            justify-items: center;
+        }
+
+        .seat {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: gray;
+        }
+
+        .analysis {
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .party-color {
+            font-weight: bold;
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        #law-simulator {
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Stortingsimulator</h1>
+    <p>Simuler det norske stortinget ved å justere partioppslutning, se mandatfordeling, og utforsk koalisjoner.</p>
+</header>
+
+<main>
+    <div id="control-panel">
+        <h2>Partioppslutning</h2>
+        <div id="party-controls">
+            <!-- Party slider templates -->
+            <div class="party-slider" data-party="Ap">
+                <label>Ap</label>
+                <input type="range" min="0" max="40" value="0">
+                <span class="percentage">0%</span>
+            </div>
+            <div class="party-slider" data-party="H">
+                <label>H</label>
+                <input type="range" min="0" max="40" value="0">
+                <span class="percentage">0%</span>
+            </div>
+            <div class="party-slider" data-party="Sp">
+                <label>Sp</label>
+                <input type="range" min="0" max="40" value="0">
+                <span class="percentage">0%</span>
+            </div>
+            <div class="party-slider" data-party="FrP">
+                <label>FrP</label>
+                <input type="range" min="0" max="40" value="0">
+                <span class="percentage">0%</span>
+            </div>
+            <div class="party-slider" data-party="SV">
+                <label>SV</label>
+                <input type="range" min="0" max="40" value="0">
+                <span class="percentage">0%</span>
+            </div>
+            <div class="party-slider" data-party="R">
+                <label>R</label>
+                <input type="range" min="0" max="40" value="0">
+                <span class="percentage">0%</span>
+            </div>
+            <div class="party-slider" data-party="V">
+                <label>V</label>
+                <input type="range" min="0" max="40" value="0">
+                <span class="percentage">0%</span>
+            </div>
+            <div class="party-slider" data-party="KrF">
+                <label>KrF</label>
+                <input type="range" min="0" max="40" value="0">
+                <span class="percentage">0%</span>
+            </div>
+            <div class="party-slider" data-party="MDG">
+                <label>MDG</label>
+                <input type="range" min="0" max="40" value="0">
+                <span class="percentage">0%</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="mandate-view">
+        <h2>Mandatfordeling</h2>
+        <div id="mandate-chart"></div>
+        <p id="mandate-numbers"></p>
+    </div>
+
+    <div id="coalition-analysis" class="analysis">
+        <h2>Flertallsanalyse</h2>
+        <p id="coalition-result"></p>
+    </div>
+
+    <div id="law-simulator">
+        <h2>Vedtakssimulator</h2>
+        <p>Velg en sakskategori og se mulig utfall basert på mandatfordeling.</p>
+        <!-- Simple selector, in expanded utility would be linked to law and position data -->
+        <select id="issue-select">
+            <option value="economy">Økonomi/skatter</option>
+            <option value="climate">Klima/miljø</option>
+            <option value="immigration">Innvandring</option>
+            <option value="health">Helse/velferd</option>
+            <option value="eu">EU/EØS</option>
+            <option value="defense">Forsvar/sikkerhet</option>
+        </select>
+        <button id="simulate-law">Simuler Vedtak</button>
+        <p id="law-result"></p>
+    </div>
+</main>
+
+<footer>
+    <p>Kilder: Offisielle valgresultater og partipolitikk.</p>
+</footer>
+
+<script>
+    // Party data
+    const parties = {
+        "Ap": { color: "#E63946", ideology: "left" },
+        "H": { color: "#5DADE2", ideology: "right" },
+        "Sp": { color: "#50B432", ideology: "centre" },
+        "FrP": { color: "#B03A2E", ideology: "right" },
+        "SV": { color: "#8E44AD", ideology: "left" },
+        "R": { color: "#C0392B", ideology: "left" },
+        "V": { color: "#58D68D", ideology: "centre" },
+        "KrF": { color: "#F4D03F", ideology: "right" },
+        "MDG": { color: "#27AE60", ideology: "centre" }
+    };
+
+    const thresholds = { seats: 169, threshold: 4 };
+
+    const controlPanel = document.getElementById('party-controls');
+    const mandateChart = document.getElementById('mandate-chart');
+    const coalitionResult = document.getElementById('coalition-result');
+    const mandateNumbers = document.getElementById('mandate-numbers');
+    const lawResult = document.getElementById('law-result');
+    const simulateLawButton = document.getElementById('simulate-law');
+
+    controlPanel.querySelectorAll('.party-slider input[type="range"]').forEach(input => {
+        input.addEventListener('input', updatePercentages);
+    });
+
+    simulateLawButton.addEventListener('click', simulateLaw);
+
+    function updatePercentages() {
+        const sliders = [...controlPanel.querySelectorAll('.party-slider input[type="range"]')];
+        const totalPercent = sliders.reduce((acc, slider) => acc + parseInt(slider.value), 0);
+        sliders.forEach(slider => {
+            const value = Math.min(40, Math.max(0, parseFloat(slider.value) * 100 / totalPercent));
+            slider.parentNode.querySelector('.percentage').textContent = value.toFixed(1) + '%';
+            slider.value = value;
+        });
+        calculateMandates();
+    }
+
+    function calculateMandates() {
+        let mandates = {};
+        let totalVotes = 0;
+        controlPanel.querySelectorAll('.party-slider').forEach(sliderContainer => {
+            const party = sliderContainer.getAttribute('data-party');
+            const percentage = parseFloat(sliderContainer.querySelector('input').value);
+            totalVotes += percentage;
+            mandates[party] = { percentage, votes: 0 };
+        });
+        const quota = totalVotes / thresholds.seats;
+        
+        function distributeSeats() {
+            let parties = Object.keys(mandates);
+            parties.forEach(p => {
+                mandates[p].votes = Math.round(mandates[p].percentage / quota);
+            });
+            let totalMandates = Object.values(mandates).reduce((total, p) => total + p.votes, 0);
+            while (totalMandates < thresholds.seats) {
+                let maxResidual = -1;
+                let maxParty = null;
+                parties.forEach(p => {
+                    const residual = mandates[p].percentage - mandates[p].votes * quota;
+                    if (residual > maxResidual) {
+                        maxResidual = residual;
+                        maxParty = p;
+                    }
+                });
+                mandates[maxParty].votes++;
+                totalMandates++;
+            }
+        }
+
+        distributeSeats();
+
+        let mandateHtml = '';
+        let mandateNumHtml = '';
+        mandateChart.innerHTML = '';
+        let position = 0;
+        for (let [party, data] of Object.entries(mandates)) {
+            mandateNumHtml += `<span class="party-color" style="background-color:${parties[party].color}"></span>${party}: ${data.votes} mandater<br>`;
+            for (let i = 0; i < data.votes; i++) {
+                mandateHtml += `<div class="seat" style="background-color: ${parties[party].color}" title="${party}"></div>`;
+                position++;
+            }
+        }
+        mandateNumbers.innerHTML = mandateNumHtml;
+        mandateChart.innerHTML = mandateHtml;
+
+        analyzeCoalitions(mandates);
+    }
+
+    function analyzeCoalitions(mandates) {
+        const leftParties = ["Ap", "SV", "R", "Sp"];
+        const rightParties = ["H", "FrP", "V", "KrF"];
+        const centreParties = ["Sp", "V", "KrF", "MDG"];
+
+        const calculateSeats = (partyList) => partyList.reduce((acc, party) => acc + (mandates[party]?.votes || 0), 0);
+
+        const leftSeats = calculateSeats(leftParties);
+        const rightSeats = calculateSeats(rightParties);
+        const centreSeats = calculateSeats(centreParties);
+
+        let coalitionHtml = '';
+        coalitionHtml += `<p>Rød-grønn side: ${leftSeats} mandater</p>`;
+        coalitionHtml += `<p>Borgerlig side: ${rightSeats} mandater</p>`;
+        coalitionHtml += `<p>Sentrum/vippe: ${centreSeats} mandater</p>`;
+
+        coalitionResult.innerHTML = coalitionHtml;
+    }
+
+    function simulateLaw() {
+        const issues = {
+            "economy": { left: "mot", right: "for", centre: "nøytral" },
+            "climate": { left: "for", right: "mot", centre: "for" },
+            "immigration": { left: "for", right: "mot", centre: "nøytral" },
+            "health": { left: "for", right: "mot", centre: "for" },
+            "eu": { left: "mot", right: "for", centre: "nøytral" },
+            "defense": { left: "nøytral", right: "for", centre: "for" }
+        };
+
+        const currentIssue = document.getElementById('issue-select').value;
+        const stance = issues[currentIssue];
+
+        coalitionResult.innerHTML += `<p>${capitalize(currentIssue)} is likely to: ${stance.left === 'for' ? 'pass' : 'fail'} on left</p>`;
+    }
+
+    function capitalize(s) {
+        return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    updatePercentages();
+</script>
+
+</body>
+</html>

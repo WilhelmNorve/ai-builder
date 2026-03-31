@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+        }
+        .calculator {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            max-width: 400px;
+            gap: 10px;
+        }
+        .display {
+            grid-column: span 4;
+            background-color: #222;
+            color: #fff;
+            text-align: right;
+            padding: 20px;
+            font-size: 2em;
+        }
+        button {
+            padding: 20px;
+            font-size: 1.5em;
+            border: none;
+            background-color: #e0e0e0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:active {
+            background-color: #d0d0d0;
+        }
+        button:hover {
+            background-color: #c0c0c0;
+        }
+        .operator {
+            background-color: #ff9500;
+            color: white;
+        }
+        .operator:active {
+            background-color: #d47400;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display" id="display">0</div>
+        <button class="operator" onclick="clearDisplay()">C</button>
+        <button class="operator" onclick="inputOperator('/')">÷</button>
+        <button class="operator" onclick="inputOperator('*')">×</button>
+        <button class="operator" onclick="inputOperator('-')">-</button>
+        <button onclick="inputNumber('7')">7</button>
+        <button onclick="inputNumber('8')">8</button>
+        <button onclick="inputNumber('9')">9</button>
+        <button class="operator" onclick="inputOperator('+')">+</button>
+        <button onclick="inputNumber('4')">4</button>
+        <button onclick="inputNumber('5')">5</button>
+        <button onclick="inputNumber('6')">6</button>
+        <button onclick="inputNumber('1')">1</button>
+        <button onclick="inputNumber('2')">2</button>
+        <button onclick="inputNumber('3')">3</button>
+        <button onclick="inputNumber('0')">0</button>
+        <button onclick="inputNumber('.')">.</button>
+        <button class="operator" onclick="calculate()">=</button>
+    </div>
+    <script>
+        let currentNumber = '';
+        let previousNumber = '';
+        let selectedOperator = '';
+        
+        function updateDisplay() {
+            const display = document.getElementById('display');
+            display.textContent = currentNumber || '0';
+        }
+
+        function inputNumber(num) {
+            if (num === '.' && currentNumber.includes('.')) return;
+            currentNumber += num;
+            updateDisplay();
+        }
+
+        function inputOperator(op) {
+            if (currentNumber === '') return;
+            if (previousNumber !== '') calculate();
+            selectedOperator = op;
+            previousNumber = currentNumber;
+            currentNumber = '';
+        }
+
+        function calculate() {
+            let result;
+            const prev = parseFloat(previousNumber);
+            const current = parseFloat(currentNumber);
+            if (isNaN(prev) || isNaN(current)) return;
+            
+            switch (selectedOperator) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '-':
+                    result = prev - current;
+                    break;
+                case '*':
+                    result = prev * current;
+                    break;
+                case '/':
+                    if (current === 0) {
+                        alert('Error: Division by Zero');
+                        clearDisplay();
+                        return;
+                    }
+                    result = prev / current;
+                    break;
+                default:
+                    return;
+            }
+            currentNumber = result.toString();
+            previousNumber = '';
+            selectedOperator = '';
+            updateDisplay();
+        }
+
+        function clearDisplay() {
+            currentNumber = '';
+            previousNumber = '';
+            selectedOperator = '';
+            updateDisplay();
+        }
+
+        updateDisplay();
+    </script>
+</body>
+</html>

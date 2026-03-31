@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f8ff;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .weather-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 300px;
+            width: 100%;
+        }
+        .loading, .error {
+            font-size: 1.2em;
+            padding: 20px;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .weather-icon {
+            font-size: 3em;
+        }
+        .weather-info {
+            margin-top: 10px;
+        }
+        .metric {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="weather-container">
+        <div class="loading" id="loading"><div class="spinner"></div>Loading...</div>
+        <div class="error" id="error"></div>
+        <div class="weather-info" id="weather-info" style="display: none;">
+            <div class="weather-icon" id="weather-icon">☀️</div>
+            <div class="temperature" id="temperature"></div>
+            <div class="description" id="description"></div>
+            <div class="wind" id="wind"></div>
+        </div>
+    </div>
+
+    <script>
+        function getWeatherDescription(code) {
+            const descriptions = {
+                0: 'Clear sky ☀️',
+                1: 'Mainly clear ⛅',
+                2: 'Partly cloudy 🌥️',
+                3: 'Overcast ☁️',
+                45: 'Fog 🌫️',
+                48: 'Depositing rime fog',
+                51: 'Light drizzle 🌧️',
+                61: 'Light rain 🌧️',
+                71: 'Light snow fall ❄️',
+                80: 'Rain showers ⛈️',
+                95: 'Thunderstorm ⛈️'
+                // Add more mappings as needed
+            };
+            return descriptions[code] || 'Unknown';
+        }
+
+        function fetchWeather(latitude, longitude) {
+            const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=auto`;
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.current_weather) {
+                        throw new Error('Invalid API response');
+                    }
+                    const weatherCode = data.current_weather.weathercode;
+                    const temperature = data.current_weather.temperature;
+                    const windSpeed = data.current_weather.windspeed;
+                    const windDirection = data.current_weather.winddirection;
+
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('weather-info').style.display = 'block';
+                    document.getElementById('weather-icon').textContent = getWeatherDescription(weatherCode);
+                    document.getElementById('temperature').textContent = `Temperature: ${temperature}°C`;
+                    document.getElementById('description').textContent = getWeatherDescription(weatherCode);
+                    document.getElementById('wind').textContent = `Wind: ${windSpeed} km/h at ${windDirection}°`;
+                })
+                .catch(error => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('error').textContent = `Error: ${error.message}`;
+                    document.getElementById('error').style.display = 'block';
+                });
+        }
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    fetchWeather(position.coords.latitude, position.coords.longitude);
+                }, error => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('error').textContent = 'Geolocation access denied.';
+                    document.getElementById('error').style.display = 'block';
+                });
+            } else {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').textContent = 'Geolocation is not supported by this browser.';
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('error').style.display = 'none';
+        getLocation();
+    </script>
+</body>
+</html>

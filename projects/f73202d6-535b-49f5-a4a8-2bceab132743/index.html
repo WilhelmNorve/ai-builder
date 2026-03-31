@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>British Time Clock</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/responsive.css">
+</head>
+
+<body>
+    <div class="clock-container">
+        <div class="time-display">
+            <span id="time"></span>
+            <span id="format-toggle" onclick="toggleFormat()">Toggle 12/24</span>
+        </div>
+        <div class="date-display" id="date"></div>
+        <div class="day-display" id="day"></div>
+        <div class="timezone-display" id="timezone"></div>
+    </div>
+
+    <script src="scripts/clock.js"></script>
+    <script src="scripts/timezone.js"></script>
+    <script src="scripts/ui.js"></script>
+</body>
+
+</html>
+/* styles/main.css */
+body {
+    background-color: #222;
+    color: #ddd;
+    font-family: 'Courier New', Courier, monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.clock-container {
+    text-align: center;
+}
+
+.time-display {
+    font-size: 3em;
+    margin-bottom: 20px;
+}
+
+#format-toggle {
+    cursor: pointer;
+    font-size: 0.5em;
+    color: #bbb;
+}
+
+.date-display,
+.day-display,
+.timezone-display {
+    font-size: 1.5em;
+    margin: 5px 0;
+}
+/* styles/responsive.css */
+@media (max-width: 600px) {
+    .time-display {
+        font-size: 2.5em;
+    }
+
+    .date-display,
+    .day-display,
+    .timezone-display {
+        font-size: 1em;
+    }
+}
+// scripts/clock.js
+let is24HourFormat = true;
+
+function updateTime() {
+    const now = new Date();
+    const options = is24HourFormat ? { hour12: false } : { hour12: true };
+    const time = now.toLocaleTimeString('en-GB', options);
+    const dateFormat = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const dayFormat = now.toLocaleDateString('en-GB', { weekday: 'long' });
+
+    document.getElementById('time').textContent = time;
+    document.getElementById('date').textContent = dateFormat;
+    document.getElementById('day').textContent = dayFormat;
+
+    const timezone = now.toLocaleTimeString('en-GB', { timeZoneName: 'short' }).split(' ')[2];
+    document.getElementById('timezone').textContent = timezone;
+}
+
+function toggleFormat() {
+    is24HourFormat = !is24HourFormat;
+}
+
+setInterval(updateTime, 1000);
+updateTime();
+// scripts/timezone.js
+// Placeholder for potential timezone handling or API usage if needed
+// scripts/ui.js
+// Placeholder for potential UI interactivity features if needed

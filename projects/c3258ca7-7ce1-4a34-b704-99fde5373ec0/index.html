@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background: linear-gradient(to bottom, #87CEFA, #f0f8ff);
+            color: #333;
+            transition: background 0.5s;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .search-bar {
+            position: relative;
+        }
+
+        .search-bar input {
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .current-weather {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .current-weather > .temperature {
+            font-size: 3rem;
+            margin: 0;
+        }
+
+        .icon {
+            font-size: 5rem;
+        }
+
+        .details {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .forecast {
+            margin-top: 2rem;
+        }
+
+        .hourly, 
+        .daily {
+            overflow-x: auto;
+            white-space: nowrap;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .hourly div, 
+        .daily div {
+            display: inline-block;
+            padding: 10px;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        @media (max-width: 600px) {
+            .details {
+                flex-wrap: wrap;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 24px;
+            height: 24px;
+            animation: spin 2s linear infinite;
+            position: absolute;
+            right: 5px;
+            top: 5px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div>Your Weather</div>
+        <div class="search-bar">
+            <input type="text" id="cityInput" placeholder="Search city">
+            <div id="loader" class="loader hidden"></div>
+        </div>
+    </header>
+
+    <main>
+        <div class="current-weather" id="currentWeather">
+            <div class="icon" id="weatherIcon">☀️</div>
+            <div class="temperature" id="temperature">25°C</div>
+            <div id="description">Sunny</div>
+            <div class="details">
+                <div>Humidity: <span id="humidity">40</span>%</div>
+                <div>Wind: <span id="windSpeed">10</span> km/h</div>
+                <div>Pressure: <span id="pressure">1012</span> hPa</div>
+                <div>Sunrise: <span id="sunrise">6:00 AM</span></div>
+                <div>Sunset: <span id="sunset">7:00 PM</span></div>
+            </div>
+        </div>
+        <div class="forecast">
+            <div class="hourly" id="hourlyForecast">
+                <!-- Dynamic hourly data -->
+            </div>
+            <div class="daily" id="dailyForecast">
+                <!-- Dynamic daily data -->
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        Data by OpenWeatherMap
+    </footer>
+
+    <script>
+        const apiKey = 'YOUR_API_KEY'; // Replace with an actual API key from OpenWeatherMap
+        const currentWeatherDiv = document.getElementById('currentWeather');
+        const temperatureDiv = document.getElementById('temperature');
+        const descriptionDiv = document.getElementById('description');
+        const weatherIconDiv = document.getElementById('weatherIcon');
+        const humidityDiv = document.getElementById('humidity');
+        const windSpeedDiv = document.getElementById('windSpeed');
+        const pressureDiv = document.getElementById('pressure');
+        const sunriseDiv = document.getElementById('sunrise');
+        const sunsetDiv = document.getElementById('sunset');
+        const hourlyForecastDiv = document.getElementById('hourlyForecast');
+        const dailyForecastDiv = document.getElementById('dailyForecast');
+        const cityInput = document.getElementById('cityInput');
+        const loader = document.getElementById('loader');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const lastCity = localStorage.getItem('lastCity') || 'New York';
+            fetchWeatherData(lastCity);
+        });
+
+        cityInput.addEventListener('change', (e) => {
+            const city = e.target.value;
+            localStorage.setItem('lastCity', city);
+            fetchWeatherData(city);
+        });
+
+        async function fetchWeatherData(city) {
+            try {
+                showLoader();
+                const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateCurrentWeather(data);
+                    fetchForecastData(data.coord.lat, data.coord.lon);
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error("Error fetching current weather data:", error);
+            } finally {
+                hideLoader();
+            }
+        }
+
+        async function fetchForecastData(lat, lon) {
+            try {
+                const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateForecasts(data);
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error("Error fetching forecast data:", error);
+            }
+        }
+
+        function updateCurrentWeather(data) {
+            temperatureDiv.textContent = `${Math.round(data.main.temp)}°C`;
+            descriptionDiv.textContent = data.weather[0].description;
+            weatherIconDiv.textContent = getWeatherIcon(data.weather[0].icon);
+            humidityDiv.textContent = data.main.humidity;
+            windSpeedDiv.textContent = data.wind.speed;
+            pressureDiv.textContent = data.main.pressure;
+            sunriseDiv.textContent = new Date(data.sys.sunrise * 1000).toLocaleTimeString();
+            sunsetDiv.textContent = new Date(data.sys.sunset * 1000).toLocaleTimeString();
+            updateBackground(data.weather[0].main);
+        }
+
+        function updateForecasts(data) {
+            hourlyForecastDiv.innerHTML = '';
+            for (let i = 0; i < 8; i++) {
+                const forecast = data.list[i];
+                const div = document.createElement('div');
+                div.innerHTML = `${new Date(forecast.dt * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}<br>
+                                ${Math.round(forecast.main.temp)}°C<br>
+                                ${getWeatherIcon(forecast.weather[0].icon)}`;
+                hourlyForecastDiv.appendChild(div);
+            }
+            // Simplified daily forecast (1 entry per day, at 12:00 PM)
+            dailyForecastDiv.innerHTML = '';
+            const dailyData = data.list.filter(ele => new Date(ele.dt * 1000).getHours() === 12);
+            dailyData.forEach(forecast => {
+                const div = document.createElement('div');
+                div.innerHTML = `${new Date(forecast.dt * 1000).toLocaleDateString()}<br>
+                                Max: ${Math.round(forecast.main.temp_max)}°C Min: ${Math.round(forecast.main.temp_min)}°C<br>
+                                ${getWeatherIcon(forecast.weather[0].icon)}`;
+                dailyForecastDiv.appendChild(div);
+            });
+        }
+
+        function getWeatherIcon(icon) {
+            const iconCodeMap = {
+                '01': '☀️', // clear sky
+                '02': '🌤️', // few clouds
+                '03': '☁️', // scattered clouds
+                '04': '☁️', // broken clouds
+                '09': '🌧️', // shower rain
+                '10': '🌦️', // rain
+                '11': '⛈️', // thunderstorm
+                '13': '❄️', // snow
+                '50': '🌫️', // mist
+            };
+            return iconCodeMap[icon.substr(0, 2)] || '❓';
+        }
+
+        function updateBackground(weather) {
+            const weatherMap = {
+                Clear: 'linear-gradient(to bottom, #FFD700, #f0e68c)',
+                Clouds: 'linear-gradient(to bottom, #8A8A8A, #d3d3d3)',
+                Rain: 'linear-gradient(to bottom, #5f9ea0, #4682b4)',
+                Night: 'linear-gradient(to bottom, #483D8B, #191970)',
+                Default: 'linear-gradient(to bottom, #87CEFA, #f0f8ff)'
+            };
+            document.body.style.background = weatherMap[weather] || weatherMap['Default'];
+        }
+
+        function showLoader() {
+            loader.classList.remove('hidden');
+        }
+
+        function hideLoader() {
+            loader.classList.add('hidden');
+        }
+    </script>
+
+</body>
+
+</html>

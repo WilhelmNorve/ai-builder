@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Værmelding</title>
+    <style>
+        /* Basic styling for responsive design */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .header, .weather-card, .details-panel, .hourly-forecast, .seven-day-forecast {
+            padding: 16px;
+            border-bottom: 1px solid #ddd;
+        }
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .header input {
+            margin: 8px 0;
+        }
+        .current-temp {
+            font-size: 48px;
+            font-weight: bold;
+        }
+        .icon, .hourly-icons, .daily-icons {
+            width: 50px;
+            height: 50px;
+        }
+        .forecast-section {
+            display: flex;
+            overflow-x: auto;
+        }
+        .forecast-item {
+            margin: 0 8px;
+            text-align: center;
+        }
+        /* Responsive design for different screen sizes */
+        @media (min-width: 768px) {
+            .header {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-title">
+            <h1>Værmelding</h1>
+        </div>
+        <div class="search-location">
+            <input type="text" placeholder="Sted/Postnummer">
+            <button onclick="useCurrentLocation()">Bruk min posisjon</button>
+        </div>
+        <nav>
+            <button>Nå</button>
+            <button>I dag</button>
+            <button>7 dager</button>
+        </nav>
+    </div>
+    <div class="weather-card">
+        <div class="current-temp">15°C</div>
+        <img class="icon" src="icons/sunny.svg" alt="Sunny">
+        <div>Følt temperatur: 13°C</div>
+        <div>Vær: Solfylt</div>
+        <div>Oslo, Nå</div>
+    </div>
+    <div class="details-panel">
+        <div>Luftfuktighet: 60%</div>
+        <div>Vind: 5 m/s N</div>
+        <div>Lufttrykk: 1018 hPa</div>
+        <div>UV-indeks: 3</div>
+        <div>Sikt: 10 km</div>
+        <div>Soloppgang: 07:00 | Solnedgang: 19:00</div>
+    </div>
+    <div class="hourly-forecast forecast-section">
+        <!-- Sample hourly data -->
+        <div class="forecast-item">
+            <img class="hourly-icons" src="icons/cloudy.svg" alt="Cloudy">
+            <div>16°C</div>
+            <div>20%</div>
+        </div>
+        <!-- Repeat for more hours -->
+    </div>
+    <div class="seven-day-forecast">
+        <div class="daily-icons"> <!-- Repeat for each day -->
+            <div class="forecast-item">
+                <img class="daily-icons" src="icons/rainy.svg" alt="Rainy">
+                <div>Mandag</div>
+                <div>Høy: 10°C Lav: 5°C</div>
+                <div>Regn: 80%</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JS to handle geolocation and API calls
+        function useCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const { latitude, longitude } = position.coords;
+                    fetchWeatherData(latitude, longitude);
+                }, error => {
+                    alert("Kunne ikke hente posisjon");
+                });
+            } else {
+                alert("Geolokalisering ikke støttet av denne nettleseren.");
+            }
+        }
+
+        function fetchWeatherData(lat, lon) {
+            // Placeholder function to fetch API data
+            // Use yr.no API or OpenWeatherMap API
+        }
+    </script>
+</body>
+</html>
